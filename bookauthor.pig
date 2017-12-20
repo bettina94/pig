@@ -1,0 +1,10 @@
+book = LOAD '/home/hduser/Downloads/book-data' USING PigStorage(',') AS (book_id, price:double, author_id);
+author = LOAD '/home/hduser/Downloads/author-data' USING PigStorage(',') AS (author_id, author_name:chararray);
+joinbookauthor = join book by $2,author by $0;
+final_join = foreach joinbookauthor generate $0, $1, $2, $4;
+--dump final_join;
+bookauthor200 = filter final_join by $1>=200;
+--dump bookauthor200;
+jauthor = FILTER bookauthor200 BY INDEXOF($3,'J',0) == 0;
+--dump jauthor;
+STORE jauthor INTO 'home/hduser/Downloads/book_author' USING PigStorage(',');
